@@ -1,0 +1,76 @@
+package com.example.navigationdrawerdemo;
+
+import android.os.Bundle;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import com.google.android.material.navigation.NavigationView;
+
+@SuppressWarnings("ALL")
+public class MainActivity extends AppCompatActivity {
+
+    private DrawerLayout drawer;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // 1. Setup the Toolbar (The top blue bar)
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        drawer = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+
+        // 2. Attach the Hamburger Menu icon to the Toolbar
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.app_name, R.string.app_name);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        // 3. Handle Menu Clicks
+        navigationView.setNavigationItemSelectedListener(item -> {
+            Fragment selectedFragment = null;
+            int id = item.getItemId();
+
+            if (id == R.id.nav_fragment1) {
+                selectedFragment = new BlankFragment();
+            } else if (id == R.id.nav_fragment2) {
+                selectedFragment = new BlankFragment2();
+            } else if (id == R.id.nav_list) {
+                selectedFragment = new FragmentList();
+            }
+
+            if (selectedFragment != null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.contenu, selectedFragment)
+                        .commit();
+            }
+
+            drawer.closeDrawer(GravityCompat.START);
+            return true;
+        });
+
+        // 4. Load Fragment 1 by default when app opens
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.contenu, new BlankFragment())
+                    .commit();
+            navigationView.setCheckedItem(R.id.nav_fragment1);
+        }
+    }
+
+    // Optional: Close drawer if phone "Back" button is pressed
+    @Override
+    public void onBackPressed() {
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+}
